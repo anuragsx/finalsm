@@ -5,13 +5,15 @@ class Listing < ActiveRecord::Base
   self.per_page = 10
 
   attr_accessible :listingtype, :expired_at, :year, :mileage, :make, :vin, :model, :price, :body, :desc, :exterior_color,
-                  :interior_color, :doors, :engine, :transmission, :drive, :fuel, :category, :subcategory, :length, :hull
+                  :interior_color, :doors, :engine, :transmission, :drive, :fuel, :category, :subcategory, :length, :hull,
+                  :category_id, :video_uplink
 
   STATES = ['AK','AL','AR','AZ','CA','CO','CT','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MI',
             'MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VA',
             'VT','WA','WI','WV','WY']
 
 	validates :listingtype, :presence => true
+  validates :category_id, :presence => true
 
 	validates :price, :mileage, :numericality =>
                     { :only_integer => true,
@@ -108,8 +110,12 @@ class Listing < ActiveRecord::Base
   end
 
   def can_not_include_url
-    if self.desc.include?("http") || self.desc.include?("https") || self.desc.include?("www")
-      self.errors.add(:desc, "Can not have any video link.")
+    if self.category.present?
+    if self.category.id != 3
+      if self.desc.include?("http") || self.desc.include?("https") || self.desc.include?("www")
+        self.errors.add(:desc, "Can not have any video link.")
+      end
+    end
     end
   end
 
